@@ -21,6 +21,8 @@ while (($#)); do
 	shift
 done
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # path_append DIRECTORY...
 # Append DIRECTORY to `$PATH` (if it exists, and isn't in $PATH already).
 path_append() { while (($#)); do [[ -d "$1" && ":$PATH:" != *":$1:"* ]] && PATH="$PATH:$1"; shift; done; export PATH; }
@@ -40,7 +42,7 @@ export CLICOLOR=1
 export HISTCONTROL=erasedups:ignorespace:ignoredups
 export HISTFILESIZE=2000
 export HISTSIZE=1000
-export HISTIGNORE='&:cd:cd :cd -:cd ~:cd ..:cd..:..:clear:exit:l:lr:lh:l@:gl:fresh:freshe:h:h *'
+export HISTIGNORE='&:cd:cd :cd -:cd ~:cd ..:cd..:..:clear:exit:l:lr:lh:l@:gl:h:h *'
 export HISTTIMEFORMAT="$(printf '\033[2;37;40m')%m/%d %H:%M:%S$(printf '\033[m')  "
 
 export LC_CTYPE=${LANG:-en_US.UTF-8}
@@ -65,7 +67,7 @@ _PROFILE_OS="$(uname)"
 _PROFILE_HOST="$(hostname -s)"
 
 # User executables
-path_prepend "$HOME/bin/$_PROFILE_HOST" "$HOME/bin/$_PROFILE_OS" "$HOME/bin" "$HOME/.local/bin"
+path_prepend "$SCRIPT_DIR/$_PROFILE_HOST" "$SCRIPT_DIR/$_PROFILE_OS" "$SCRIPT_DIR" "$HOME/bin" "$HOME/.local/bin"
 
 # Rubygem executables
 which ruby gem &>/dev/null && path_prepend "$(ruby -rubygems -e 'puts Gem.user_dir' 2>/dev/null)/bin"
@@ -94,28 +96,17 @@ esac
 # Host specific settings
 #
 
-case "$_PROFILE_HOST" in
-
-	lilpete)
-		path_append \
-			"$HOME/.pear/bin" \
-			"$HOME/Library/Python/2.7/bin" \
-			"$HOME/lib" \
-			"$HOME/lib/AdobeAIRSDK-latest/bin" \
-			"$HOME/lib/phantomjs-latest/bin" \
-			"$HOME/lib/cocoaDialog.app/Contents/MacOS"
-		;;
-
-	box)
-		path_append /usr/{sbin,local/{sbin,lib}} /sbin
-		
-		# Change color of hostname in prompt (if it has one)
-		[ -n "$PS1" ] && export PS1=$(echo "$PS1" | sed -E 's/(\\e\[)[0-9]{2}(m\\\]\\h)/\194\2/g' 2>/dev/null)
-		;;
-
-esac
+#case "$_PROFILE_HOST" in
+#
+#	HOST_A)
+#		path_append \
+#			"$HOME/SOME_PATH"
+#		;;
+#
+#esac
 
 # Look for additional bash.d/ folders and include their contents
-source_dir "$HOME"/{etc,bin,bin/"$_PROFILE_OS",bin/"$_PROFILE_HOST"}/bash.d
+source_dir "$HOME"/{etc,bin}/bash.d
+source_dir {"$SCRIPT_DIR","$SCRIPT_DIR/$_PROFILE_OS","$SCRIPT_DIR/$_PROFILE_HOST"}/bash.d
 
 unset _PROFILE_HOST _PROFILE_OS
