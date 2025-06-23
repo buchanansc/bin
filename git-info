@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-git symbolic-ref HEAD 1>/dev/null || exit
-git remote show | xargs -n1 git remote show
