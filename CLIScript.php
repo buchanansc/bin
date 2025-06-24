@@ -1,23 +1,77 @@
 <?php
 /**
  * Command line script utility
+ * Facilitates using PHP on the command line.
  *
  * @author    Scott Buchanan <buchanan.sc@gmail.com>
  * @copyright 2012 Scott Buchanan
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @version   r3 2012-09-09
+ * @version   r4 2025-06-23
  * @link      http://wafflesnatcha.github.com
  */
 class CLIScript
 {
+	/**
+	 * Script name
+	 * If left blank it will assume the scripts filename.
+	 * 
+	 * @var string
+	 */	
+	var $name = "";
+
+	/**
+	 * Script version
+	 * If the running script contains a docblock with an @version tag, it will
+	 * attempt to decipher this value from that.
+	 * 
+	 * @var string|null
+	 */
+	var $description = null;
+
+	/**
+	 * Script version
+	 * If the running script contains a docblock with an @version tag, it will
+	 * attempt to decipher this value from that.
+	 * 
+	 * @var string|null
+	 */
+	var $version = null;
+
+	/**
+	 * Usage example
+	 * 
+	 * @var string|null
+	 */
+	var $usage = null;
+
+	/**
+	 * Message shown at end of help
+	 * 
+	 * @var string|null
+	 */
+	var $help = null;
+
+	/**
+	 * Word wrap length
+	 * 
+	 * @var int
+	 */
 	var $wrap = 80;
-	
+
+	/**
+	 * Defining script arguments
+	 * 
+	 * @var int
+	 */
 	var $options = array();
-	
-	var $name;
-	
-	var $description;
-	
+
+	private $filename;
+
+	private $args = array();
+
+	/**
+	 * @param array $config
+	 */
 	function __construct($config)
 	{
 		set_error_handler(array($this, "errorHandler"), E_USER_NOTICE);
@@ -31,6 +85,10 @@ class CLIScript
 			$this->$k = $v;
 		}
 		
+		$this->filename = basename($_SERVER['argv'][0]);
+
+		if ($this->name == "") $this->name = $this->filename;
+		
 		// Add -h|--help flag
 		if (is_array($this->options) && !array_key_exists("help", $this->options)) {
 			$this->options['help'] = array(
@@ -39,8 +97,13 @@ class CLIScript
 				'description' => 'Show this help',
 			);
 		}
+
+		$this->args = $this->parseArgs();
 	}
 
+	/**
+	 * @param array $config
+	 */
 	function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 	{
 		error_log(basename($errfile) . ": " . trim($errstr));
@@ -51,13 +114,16 @@ class CLIScript
 	{
 		echo $this->name . " " . $this->version . "\n";
 		echo $this->description ? wordwrap($this->description, $this->wrap) . "\n" : "";
-		echo $this->usage? "\nUsage: " . basename($_SERVER['argv'][0]) . " " . $this->usage . "\n": "";
+		echo $this->usage ? "\nUsage: " . $this->filename . " " . $this->usage . "\n" : "";
 		
 		if ($this->options) {
 			$lines = array();
 			$longest = 0;
 			foreach ($this->options as $k => $v) {
-				$u = ($v['short'] ? "-" . rtrim($v['short'], ":") . ($v['long'] ? "," : " ") . " " : "    ") . ($v['long'] ? "--" . rtrim($v['long'], ":") . " " : "") . $v['usage'];
+				$u = ($v['short'] ? "-" . rtrim($v['short'], ":")
+					. ($v['long'] ? "," : " ") . " " : "    ")
+					. ($v['long'] ? "--" . rtrim($v['long'], ":") . " " : "")
+					. (array_key_exists("usage", $v) ? $v['usage'] : "");
 				$longest = (strlen($u) > $longest) ? strlen($u) : $longest;
 				$lines[] = array($u, $v['description']);
 			}
@@ -106,5 +172,17 @@ class CLIScript
 		}
 
 		return $args;
+	}
+
+	function getArg($key = false)
+	{
+		if ($key && array_key_exists($key, $this->args))
+			return $this->args[$key];
+		return false;
+	}
+
+	function getArgs()
+	{
+		return $this->args;
 	}
 }
