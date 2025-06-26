@@ -13,7 +13,7 @@ class CLIScript
 {
 	/**
 	 * Script name
-	 * If left blank it will assume the scripts filename.
+	 * If left blank it will assume the script's filename.
 	 * 
 	 * @var string
 	 */	
@@ -102,6 +102,8 @@ class CLIScript
 	}
 
 	/**
+	 * Alternative error handler
+	 * 
 	 * @param array $config
 	 */
 	function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
@@ -110,6 +112,10 @@ class CLIScript
 		exit($errno);
 	}
 
+
+	/**
+	 * Show --help message
+	 */
 	function usage()
 	{
 		echo $this->name . " " . $this->version . "\n";
@@ -139,6 +145,11 @@ class CLIScript
 			echo "\n" . wordwrap($this->help, $this->wrap) . "\n";
 	}
 
+	/**
+	 * Process command line arguments
+	 * 
+	 * @return array
+	 */
 	function parseArgs()
 	{
 		$short_opts = "";
@@ -174,6 +185,12 @@ class CLIScript
 		return $args;
 	}
 
+	/**
+	 * Returns a specific command line argument
+	 * 
+	 * @param string $key Name of the argument
+	 * @return string|bool
+	 */
 	function getArg($key = false)
 	{
 		if ($key && array_key_exists($key, $this->args))
@@ -181,6 +198,11 @@ class CLIScript
 		return false;
 	}
 
+	/**
+	 * Returns an array of all arguments
+	 * 
+	 * @return array
+	 */
 	function getArgs()
 	{
 		return $this->args;
