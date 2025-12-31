@@ -6,15 +6,15 @@
  * @author    Scott Buchanan
  * @copyright 2025 Scott Buchanan
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @version   r4 2025-06-23
+ * @version   r5 2025-12-30
  * @link      https://github.com/buchanansc
  */
-require_once ('CLIScript.php'); 
+require_once ('CLIScript.php');
 
 function showEXIF($file)
 {
 	$data = exif_read_data($file);
-	print_r($data);
+	echo var_export($data);
 	exit;
 }
 
