@@ -8,7 +8,7 @@ alias du-graph='du -d1 "$PWD" | sed \$d | sort -rn | sed "s/${PWD////\/}\///" | 
 alias myip='curl -qsL http://checkip.dyn.com | sed -E "s/^.*Address: ([0-9\.]+).*$/\1/"'
 
 # `ls` shortcut (for GNU ls only!)
-alias l='ls -AhlqU -T4 --file-type --color=auto'
+alias l='ls -Ahlq -T4 --file-type --color=auto'
 
 # PHP's natsort is super duper
 alias natsort='php -r '\''$l=file(count($a=$_SERVER["argv"])>1&&$a[1]!="-"?$a[1]:"php://stdin");natcasesort($l);echo implode("",$l);'\'
